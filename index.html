@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confronto Prezzi Reparti</title>
+    <title>Verifica Delta Prezzi Medi </title>
     <style>
         /* Qui inizia il CSS */
         body {
@@ -113,7 +113,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Confronto Prezzi Reparti</h1>
+        <h1>Verifica Delta Prezzi Medi</h1>
         <p>Inserisci i prezzi medi delle merci per ogni reparto, seleziona il tuo punto vendita e la data del report.</p>
 
         <form id="priceForm">
@@ -244,9 +244,9 @@
 
                 let line = `${departments[key]}: `;
                 if (difference > 0) {
-                    line += `Il prezzo è superiore al prezzo medio della catena di ${differenceText} €.\n`;
+                    line += `Il prezzo è superiore al prezzo medio DML  ${differenceText} €.\n`;
                 } else if (difference < 0) {
-                    line += `Il prezzo è inferiore al prezzo medio della catola di ${Math.abs(differenceText)} €.\n`;
+                    line += `Il prezzo è inferiore al prezzo medio DML  ${Math.abs(differenceText)} €.\n`;
                 } else {
                     line += `Il prezzo è uguale al prezzo medio della catena.\n`;
                 }
