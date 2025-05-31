@@ -13,7 +13,7 @@
             --telegram-color: #0088cc;
             --telegram-hover: #006699;
             --background-light: #f8f9fa;
-            --background-medium: #e9ecef;
+            --background-medium: #e9ecef; /* Now only used for potential future use or if other elements need it */
             --text-dark: #343a40;
             --text-medium: #6c757d;
             --border-light: #ced4da;
@@ -39,7 +39,7 @@
             border-radius: var(--border-radius);
             box-shadow: 0 4px 20px var(--shadow-light);
             width: 100%;
-            max-width: 550px; /* Slightly wider for better spacing */
+            max-width: 550px;
             text-align: center;
             box-sizing: border-box;
         }
@@ -58,29 +58,29 @@
         }
 
         .form-group {
-            margin-bottom: 20px; /* Increased space between form groups */
+            margin-bottom: 20px;
             text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 8px; /* Space between label and input */
+            margin-bottom: 8px;
             color: var(--text-dark);
             font-weight: 600;
             font-size: 0.95em;
         }
 
         label .icon {
-            margin-right: 8px; /* Space between icon and text */
-            font-size: 1.1em; /* Slightly larger icon */
-            vertical-align: middle; /* Align icon vertically with text */
+            margin-right: 8px;
+            font-size: 1.1em;
+            vertical-align: middle;
         }
 
         input[type="number"],
         input[type="date"],
         select {
             width: 100%;
-            padding: 12px 15px; /* More padding for better feel */
+            padding: 12px 15px;
             border: 1px solid var(--border-light);
             border-radius: var(--border-radius);
             box-sizing: border-box;
@@ -88,7 +88,7 @@
             color: var(--text-dark);
             background-color: #fff;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            -webkit-appearance: none; /* Remove default styling for select/date */
+            -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
         }
@@ -107,20 +107,20 @@
             background-repeat: no-repeat;
             background-position: right 15px center;
             background-size: 10px;
-            padding-right: 40px; /* Make space for custom arrow */
+            padding-right: 40px;
         }
 
         .button-group {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Increased space between buttons */
+            gap: 15px;
             margin-top: 30px;
         }
 
         button {
             background-color: var(--primary-color);
             color: white;
-            padding: 14px 25px; /* Larger buttons */
+            padding: 14px 25px;
             border: none;
             border-radius: var(--border-radius);
             cursor: pointer;
@@ -129,13 +129,13 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
             width: 100%;
             letter-spacing: 0.5px;
-            display: flex; /* Allow content to be aligned */
-            justify-content: center; /* Center content */
-            align-items: center; /* Center content vertically */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         button .icon {
-            margin-right: 10px; /* Space between icon and text in button */
+            margin-right: 10px;
             font-size: 1.2em;
         }
 
@@ -154,53 +154,6 @@
 
         .button-telegram:hover {
             background-color: var(--telegram-hover);
-        }
-
-        .result-message {
-            margin-top: 35px;
-            padding: 20px; /* More padding */
-            background-color: var(--background-medium);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            text-align: left;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-size: 0.95em;
-            line-height: 1.8; /* Increased line height for readability */
-            color: var(--text-dark);
-            min-height: 150px; /* Ensure some height for the message area */
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Space between message elements */
-        }
-
-        .result-message textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-light);
-            border-radius: 5px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9em;
-            background-color: #fcfcfc;
-            resize: vertical; /* Allow vertical resizing */
-            min-height: 100px;
-        }
-
-        .result-message p {
-            margin: 5px 0;
-            color: var(--text-dark); /* Ensure paragraph text color is dark */
-        }
-
-        .result-message a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
-        }
-
-        .result-message a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
         }
     </style>
 </head>
@@ -266,21 +219,19 @@
                 <button type="button" onclick="generateAndSend('telegram')" class="button-telegram"><span class="icon">✈️</span> Invia Report tramite Telegram</button>
             </div>
         </form>
-
-        <div id="result" class="result-message"></div>
     </div>
 
     <script>
         // Prezzi medi della catena (VALORI FISSI) - MODIFICA QUESTI VALORI CON I TUOI REALI!
         const fixedPrices = {
-            clima: 157.00,       // Esempio
-            bianco: 440.00,      // Esempio
-            bruno: 298.00,       // Esempio
-            smartphone: 323.00,  // Esempio
-            informatica: 268.00, // Esempio
-            mobile: 172.00,      // Esempio
-            ped: 80.00,          // Esempio
-            totale: 78.00        // Esempio (somma o valore complessivo)
+            clima: 157.00,
+            bianco: 440.00,
+            bruno: 298.00,
+            smartphone: 323.00,
+            informatica: 268.00,
+            mobile: 172.00,
+            ped: 80.00,
+            totale: 78.00
         };
 
         function generateMessageContent() {
@@ -290,14 +241,13 @@
             const dateInputElement = document.getElementById("reportDate");
             const selectedDate = dateInputElement.value;
 
-            // Basic validation
             if (selectedStore === "") {
                 alert("Per favore, seleziona il punto vendita.");
-                return null; // Return null to indicate validation failure
+                return null;
             }
             if (selectedDate === "") {
                 alert("Per favore, seleziona la data del report.");
-                return null; // Return null to indicate validation failure
+                return null;
             }
 
             const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
@@ -333,11 +283,11 @@
 
                 const fixedPrice = fixedPrices[key];
                 const difference = enteredPrice - fixedPrice;
-                const differenceText = difference.toFixed(2); // Keep two decimal places for consistency
+                const differenceText = difference.toFixed(2);
 
                 let formattedDifference;
                 if (differenceText.endsWith('.00')) {
-                    formattedDifference = differenceText.slice(0, -3); // Remove .00 if integer
+                    formattedDifference = differenceText.slice(0, -3);
                 } else {
                     formattedDifference = differenceText;
                 }
@@ -357,7 +307,7 @@
                 return null;
             }
 
-            messageContent += comparisonDetails.join('\n\n'); // Add two newlines between each detail for more space
+            messageContent += comparisonDetails.join('\n\n');
             messageContent += `\n\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
 
             return messageContent;
@@ -366,7 +316,7 @@
         function generateAndSend(type) {
             const messageContent = generateMessageContent();
             if (!messageContent) {
-                return; // Stop if validation failed in generateMessageContent
+                return;
             }
 
             const storeSelectElement = document.getElementById("storeSelect");
@@ -375,8 +325,9 @@
             const selectedDate = dateInputElement.value;
             const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
 
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = ''; // Clear previous message
+            // No need to touch resultDiv as it's removed
+            // const resultDiv = document.getElementById("result");
+            // resultDiv.innerHTML = '';
 
             if (type === 'email') {
                 const emailTo = "d.pavoni@dml-italia.com";
@@ -384,23 +335,9 @@
                 const mailtoLink = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageContent)}`;
 
                 window.location.href = mailtoLink;
-
-                resultDiv.innerHTML = `
-                    <p>La tua applicazione email dovrebbe aprirsi a breve con il messaggio precompilato.</p>
-                    <p>In caso contrario, puoi copiare il testo qui sotto e incollarlo manualmente:</p>
-                    <textarea rows="15" readonly>${messageContent}</textarea>
-                `;
             } else if (type === 'telegram') {
                 const telegramLink = `https://t.me/share/url?url=&text=${encodeURIComponent(messageContent)}`;
-
-                window.open(telegramLink, '_blank'); // Open in a new tab
-
-                resultDiv.innerHTML = `
-                    <p>La tua applicazione Telegram dovrebbe aprirsi a breve con il messaggio precompilato.</p>
-                    <p>Dovrai selezionare il destinatario del messaggio.</p>
-                    <p>In caso contrario, puoi copiare il testo qui sotto e incollarlo manualmente:</p>
-                    <textarea rows="15" readonly>${messageContent}</textarea>
-                `;
+                window.open(telegramLink, '_blank');
             }
         }
     </script>
