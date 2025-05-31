@@ -3,112 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifica Delta Prezzi Medi </title>
+    <title>Verifica Delta Prezzi Medi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Qui inizia il CSS */
+        /* Modern Reset & Base Styles */
+        :root {
+            --primary-color: #4A90E2;
+            --primary-hover: #357ABD;
+            --telegram-color: #0088cc;
+            --telegram-hover: #006699;
+            --background-light: #f8f9fa;
+            --background-medium: #e9ecef;
+            --text-dark: #343a40;
+            --text-medium: #6c757d;
+            --border-light: #ced4da;
+            --border-radius: 8px;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-light);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            line-height: 1.6;
+            color: var(--text-dark);
         }
 
         .container {
             background-color: #fff;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px var(--shadow-light);
             width: 100%;
-            max-width: 500px;
+            max-width: 550px; /* Slightly wider for better spacing */
             text-align: center;
+            box-sizing: border-box;
         }
 
         h1 {
-            color: #333;
+            color: var(--text-dark);
             margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: 700;
         }
 
         p {
-            color: #666;
+            color: var(--text-medium);
             margin-bottom: 30px;
+            font-size: 1.1em;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px; /* Increased space between form groups */
             text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: bold;
+            margin-bottom: 8px; /* Space between label and input */
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.95em;
         }
 
-        input[type="number"], input[type="date"], select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-            appearance: none; /* Rimuove lo stile predefinito di alcuni browser per select e input date */
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 12px;
-            padding-right: 30px; /* Spazio per l'icona */
-        }
-        /* Icona per il select */
+        input[type="number"],
+        input[type="date"],
         select {
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.8c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%204.6%201.8%208.9%205.4%2012.5l128%20127.9c3.6%203.6%207.8%205.4%2012.5%205.4s8.9-1.8%2012.5-5.4L287%2094.7c3.6-3.6%205.4-7.8%205.4-12.5c0-4.6-1.8-8.9-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            width: 100%;
+            padding: 12px 15px; /* More padding for better feel */
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            box-sizing: border-box;
+            font-size: 1em;
+            color: var(--text-dark);
+            background-color: #fff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            -webkit-appearance: none; /* Remove default styling for select/date */
+            -moz-appearance: none;
+            appearance: none;
         }
 
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+            outline: none;
+        }
+
+        /* Custom arrow for select */
+        select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c757d%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.8c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%204.6%201.8%208.9%205.4%2012.5l128%20127.9c3.6%203.6%207.8%205.4%2012.5%205.4s8.9-1.8%2012.5-5.4L287%2094.7c3.6-3.6%205.4-7.8%205.4-12.5c0-4.6-1.8-8.9-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 10px;
+            padding-right: 40px; /* Make space for custom arrow */
+        }
 
         .button-group {
             display: flex;
-            flex-direction: column; /* Impila i pulsanti verticalmente */
-            gap: 10px; /* Spazio tra i pulsanti */
-            margin-top: 20px;
+            flex-direction: column;
+            gap: 15px; /* Increased space between buttons */
+            margin-top: 30px;
         }
 
         button {
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
-            padding: 12px 20px;
+            padding: 14px 25px; /* Larger buttons */
             border: none;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            width: 100%; /* I pulsanti occupano tutta la larghezza */
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            letter-spacing: 0.5px;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .button-telegram {
-            background-color: #0088cc; /* Colore tipico di Telegram */
+            background-color: var(--telegram-color);
         }
 
         .button-telegram:hover {
-            background-color: #006699;
+            background-color: var(--telegram-hover);
         }
 
         .result-message {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
+            margin-top: 35px;
+            padding: 20px; /* More padding */
+            background-color: var(--background-medium);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
             text-align: left;
-            white-space: pre-wrap; /* Mantiene la formattazione del testo, inclusi i salti di riga */
-            word-wrap: break-word; /* Spezza le parole lunghe */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.95em;
+            line-height: 1.8; /* Increased line height for readability */
+            color: var(--text-dark);
+            min-height: 150px; /* Ensure some height for the message area */
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Space between message elements */
         }
-        /* Qui finisce il CSS */
+
+        .result-message textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            background-color: #fcfcfc;
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 100px;
+        }
+
+        .result-message p {
+            margin: 5px 0;
+            color: var(--text-dark); /* Ensure paragraph text color is dark */
+        }
+
+        .result-message a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .result-message a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -169,8 +248,8 @@
             </div>
 
             <div class="button-group">
-                <button type="button" onclick="generateMessage('email')">Genera Messaggio Email</button>
-                <button type="button" onclick="generateMessage('telegram')" class="button-telegram">Invia tramite Telegram</button>
+                <button type="button" onclick="generateMessage('email')">Invia Report tramite Email</button>
+                <button type="button" onclick="generateMessage('telegram')" class="button-telegram">Invia Report tramite Telegram</button>
             </div>
         </form>
 
@@ -178,7 +257,6 @@
     </div>
 
     <script>
-        /* Qui inizia il JavaScript */
         // Prezzi medi della catena (VALORI FISSI) - MODIFICA QUESTI VALORI CON I TUOI REALI!
         const fixedPrices = {
             clima: 157.00,       // Esempio
@@ -187,8 +265,8 @@
             smartphone: 323.00,  // Esempio
             informatica: 268.00, // Esempio
             mobile: 172.00,      // Esempio
-            ped: 80.00,         // Esempio
-            totale: 78.00      // Esempio (somma o valore complessivo)
+            ped: 80.00,          // Esempio
+            totale: 78.00        // Esempio (somma o valore complessivo)
         };
 
         function generateMessage(type) {
@@ -196,9 +274,9 @@
             const selectedStore = storeSelectElement.value;
 
             const dateInputElement = document.getElementById("reportDate");
-            const selectedDate = dateInputElement.value; // Formato YYYY-MM-DD
+            const selectedDate = dateInputElement.value;
 
-            // Validazione del punto vendita e della data
+            // Basic validation
             if (selectedStore === "") {
                 alert("Per favore, seleziona il punto vendita.");
                 return;
@@ -208,10 +286,8 @@
                 return;
             }
 
-            // Formattare la data per il messaggio (es. DD/MM/YYYY)
             const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
 
-            // Mapping dei nomi dei reparti per il messaggio
             const departments = {
                 clima: "Clima",
                 bianco: "Bianco",
@@ -223,10 +299,14 @@
                 totale: "Totale"
             };
 
-            let messageContent = `Report Confronto Prezzi Reparti - ${selectedStore} - Data: ${formattedDate}\n\n`;
-            messageContent += `Gentile Direzione,\n\nIl punto vendita ${selectedStore} ha compilato il report per la data ${formattedDate}. Di seguito il confronto dei prezzi medi dei reparti:\n\n`;
+            let messageContent = `Report Confronto Prezzi Reparti\n`;
+            messageContent += `Punto Vendita: ${selectedStore}\n`;
+            messageContent += `Data Report: ${formattedDate}\n\n`;
+            messageContent += `Gentile Direzione,\n\n`;
+            messageContent += `Il punto vendita ${selectedStore} ha compilato il report per la data ${formattedDate}. Di seguito il confronto dei prezzi medi dei reparti:\n\n`;
 
             let allPricesValid = true;
+            let comparisonDetails = [];
 
             for (const key in departments) {
                 const inputElement = document.getElementById(key);
@@ -244,46 +324,51 @@
 
                 let line = `${departments[key]}: `;
                 if (difference > 0) {
-                    line += `Il prezzo è superiore al prezzo medio DML  ${differenceText} €.\n`;
+                    line += `Prezzo superiore al prezzo medio DML di ${differenceText} €`;
                 } else if (difference < 0) {
-                    line += `Il prezzo è inferiore al prezzo medio DML  ${Math.abs(differenceText)} €.\n`;
+                    line += `Prezzo inferiore al prezzo medio DML di ${Math.abs(differenceText)} €`;
                 } else {
-                    line += `Il prezzo è uguale al prezzo medio della catena.\n`;
+                    line += `Prezzo uguale al prezzo medio della catena`;
                 }
-                messageContent += line;
+                comparisonDetails.push(line);
             }
 
             if (!allPricesValid) {
-                return; // Ferma l'esecuzione se ci sono campi invalidi
+                return;
             }
 
-            messageContent += `\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
+            messageContent += comparisonDetails.join('\n'); // Join lines with newline
+            messageContent += `\n\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
 
             const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = ''; // Clear previous message
 
             if (type === 'email') {
                 const emailTo = "d.pavoni@dml-italia.com";
-                const subject = `Report Confronto Prezzi Reparti - ${selectedStore} - ${formattedDate}`; // Oggetto con data
+                const subject = `Report Confronto Prezzi Reparti - ${selectedStore} - ${formattedDate}`;
                 const mailtoLink = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageContent)}`;
 
+                // Directly open email client
+                window.location.href = mailtoLink;
+
+                // Optionally, show a confirmation message
                 resultDiv.innerHTML = `
-                    <p>Messaggio email pronto!</p>
-                    <textarea rows="10" cols="50" readonly>${messageContent}</textarea>
-                    <p><a href="${mailtoLink}">Clicca qui per aprire la tua applicazione email</a></p>
-                    <p>In alternativa, copia il testo qui sopra e incollalo nella tua email.</p>
+                    <p>La tua applicazione email dovrebbe aprirsi a breve con il messaggio precompilato.</p>
+                    <p>In caso contrario, puoi copiare il testo qui sotto e incollarlo manualmente:</p>
+                    <textarea rows="15" readonly>${messageContent}</textarea>
                 `;
             } else if (type === 'telegram') {
                 const telegramLink = `https://t.me/share/url?url=&text=${encodeURIComponent(messageContent)}`;
 
+                // Show the message in a textarea and provide the link
                 resultDiv.innerHTML = `
-                    <p>Messaggio Telegram pronto!</p>
-                    <textarea rows="10" cols="50" readonly>${messageContent}</textarea>
+                    <p>Ecco il messaggio da inviare su Telegram:</p>
+                    <textarea rows="15" readonly>${messageContent}</textarea>
                     <p><a href="${telegramLink}" target="_blank">Clicca qui per aprire Telegram e inviare il messaggio</a></p>
                     <p>Copia il testo qui sopra e incollalo su Telegram se il link non funziona direttamente.</p>
                 `;
             }
         }
-        /* Qui finisce il JavaScript */
     </script>
 </body>
 </html>
