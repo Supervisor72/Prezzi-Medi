@@ -70,6 +70,12 @@
             font-size: 0.95em;
         }
 
+        label .icon {
+            margin-right: 8px; /* Space between icon and text */
+            font-size: 1.1em; /* Slightly larger icon */
+            vertical-align: middle; /* Align icon vertically with text */
+        }
+
         input[type="number"],
         input[type="date"],
         select {
@@ -123,6 +129,14 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
             width: 100%;
             letter-spacing: 0.5px;
+            display: flex; /* Allow content to be aligned */
+            justify-content: center; /* Center content */
+            align-items: center; /* Center content vertically */
+        }
+
+        button .icon {
+            margin-right: 10px; /* Space between icon and text in button */
+            font-size: 1.2em;
         }
 
         button:hover {
@@ -197,7 +211,7 @@
 
         <form id="priceForm">
             <div class="form-group">
-                <label for="storeSelect">Seleziona il Punto Vendita:</label>
+                <label for="storeSelect"><span class="icon">📍</span> Seleziona il Punto Vendita:</label>
                 <select id="storeSelect" required>
                     <option value="">-- Seleziona --</option>
                     <option value="Fano">Fano</option>
@@ -210,46 +224,46 @@
             </div>
 
             <div class="form-group">
-                <label for="reportDate">Data del Report:</label>
+                <label for="reportDate"><span class="icon">🗓️</span> Data del Report:</label>
                 <input type="date" id="reportDate" required>
             </div>
 
             <div class="form-group">
-                <label for="clima">Clima (€):</label>
+                <label for="clima"><span class="icon">❄️</span> Clima (€):</label>
                 <input type="number" id="clima" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="bianco">Bianco (€):</label>
+                <label for="bianco"><span class="icon">🧺</span> Bianco (€):</label>
                 <input type="number" id="bianco" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="bruno">Bruno (€):</label>
+                <label for="bruno"><span class="icon">📺</span> Bruno (€):</label>
                 <input type="number" id="bruno" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="smartphone">Smartphone (€):</label>
+                <label for="smartphone"><span class="icon">📱</span> Smartphone (€):</label>
                 <input type="number" id="smartphone" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="informatica">Informatica (€):</label>
+                <label for="informatica"><span class="icon">💻</span> Informatica (€):</label>
                 <input type="number" id="informatica" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="mobile">Mobile (€):</label>
+                <label for="mobile"><span class="icon">📞</span> Mobile (€):</label>
                 <input type="number" id="mobile" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="ped">PED (€):</label>
+                <label for="ped"><span class="icon">🍳</span> PED (€):</label>
                 <input type="number" id="ped" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="totale">Totale (€):</label>
+                <label for="totale"><span class="icon">📊</span> Totale (€):</label>
                 <input type="number" id="totale" step="0.01" required>
             </div>
 
             <div class="button-group">
-                <button type="button" onclick="generateMessage('email')">Invia Report tramite Email</button>
-                <button type="button" onclick="generateMessage('telegram')" class="button-telegram">Invia Report tramite Telegram</button>
+                <button type="button" onclick="generateAndSend('email')"><span class="icon">📧</span> Invia Report tramite Email</button>
+                <button type="button" onclick="generateAndSend('telegram')" class="button-telegram"><span class="icon">✈️</span> Invia Report tramite Telegram</button>
             </div>
         </form>
 
@@ -269,7 +283,7 @@
             totale: 78.00        // Esempio (somma o valore complessivo)
         };
 
-        function generateMessage(type) {
+        function generateMessageContent() {
             const storeSelectElement = document.getElementById("storeSelect");
             const selectedStore = storeSelectElement.value;
 
@@ -279,11 +293,11 @@
             // Basic validation
             if (selectedStore === "") {
                 alert("Per favore, seleziona il punto vendita.");
-                return;
+                return null; // Return null to indicate validation failure
             }
             if (selectedDate === "") {
                 alert("Per favore, seleziona la data del report.");
-                return;
+                return null; // Return null to indicate validation failure
             }
 
             const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
@@ -299,11 +313,10 @@
                 totale: "Totale"
             };
 
-            let messageContent = `Report Confronto Prezzi Reparti\n`;
-            messageContent += `Punto Vendita: ${selectedStore}\n`;
+            let messageContent = `Report Confronto Prezzi Reparti\n\n`;
+            messageContent += `Punto Vendita: ${selectedStore}\n\n`;
             messageContent += `Data Report: ${formattedDate}\n\n`;
-            messageContent += `Gentile Direzione,\n\n`;
-            messageContent += `Il punto vendita ${selectedStore} ha compilato il report per la data ${formattedDate}. Di seguito il confronto dei prezzi medi dei reparti:\n\n`;
+            messageContent += `Di seguito il confronto dei prezzi medi dei reparti:\n\n`;
 
             let allPricesValid = true;
             let comparisonDetails = [];
@@ -320,13 +333,20 @@
 
                 const fixedPrice = fixedPrices[key];
                 const difference = enteredPrice - fixedPrice;
-                const differenceText = difference.toFixed(2);
+                const differenceText = difference.toFixed(2); // Keep two decimal places for consistency
+
+                let formattedDifference;
+                if (differenceText.endsWith('.00')) {
+                    formattedDifference = differenceText.slice(0, -3); // Remove .00 if integer
+                } else {
+                    formattedDifference = differenceText;
+                }
 
                 let line = `${departments[key]}: `;
                 if (difference > 0) {
-                    line += `Prezzo superiore al prezzo medio DML di ${differenceText} €`;
+                    line += `Prezzo superiore al prezzo medio DML di ${formattedDifference} €`;
                 } else if (difference < 0) {
-                    line += `Prezzo inferiore al prezzo medio DML di ${Math.abs(differenceText)} €`;
+                    line += `Prezzo inferiore al prezzo medio DML di ${Math.abs(formattedDifference)} €`;
                 } else {
                     line += `Prezzo uguale al prezzo medio della catena`;
                 }
@@ -334,11 +354,26 @@
             }
 
             if (!allPricesValid) {
-                return;
+                return null;
             }
 
-            messageContent += comparisonDetails.join('\n'); // Join lines with newline
+            messageContent += comparisonDetails.join('\n\n'); // Add two newlines between each detail for more space
             messageContent += `\n\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
+
+            return messageContent;
+        }
+
+        function generateAndSend(type) {
+            const messageContent = generateMessageContent();
+            if (!messageContent) {
+                return; // Stop if validation failed in generateMessageContent
+            }
+
+            const storeSelectElement = document.getElementById("storeSelect");
+            const selectedStore = storeSelectElement.value;
+            const dateInputElement = document.getElementById("reportDate");
+            const selectedDate = dateInputElement.value;
+            const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
 
             const resultDiv = document.getElementById("result");
             resultDiv.innerHTML = ''; // Clear previous message
@@ -348,10 +383,8 @@
                 const subject = `Report Confronto Prezzi Reparti - ${selectedStore} - ${formattedDate}`;
                 const mailtoLink = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageContent)}`;
 
-                // Directly open email client
                 window.location.href = mailtoLink;
 
-                // Optionally, show a confirmation message
                 resultDiv.innerHTML = `
                     <p>La tua applicazione email dovrebbe aprirsi a breve con il messaggio precompilato.</p>
                     <p>In caso contrario, puoi copiare il testo qui sotto e incollarlo manualmente:</p>
@@ -360,12 +393,13 @@
             } else if (type === 'telegram') {
                 const telegramLink = `https://t.me/share/url?url=&text=${encodeURIComponent(messageContent)}`;
 
-                // Show the message in a textarea and provide the link
+                window.open(telegramLink, '_blank'); // Open in a new tab
+
                 resultDiv.innerHTML = `
-                    <p>Ecco il messaggio da inviare su Telegram:</p>
+                    <p>La tua applicazione Telegram dovrebbe aprirsi a breve con il messaggio precompilato.</p>
+                    <p>Dovrai selezionare il destinatario del messaggio.</p>
+                    <p>In caso contrario, puoi copiare il testo qui sotto e incollarlo manualmente:</p>
                     <textarea rows="15" readonly>${messageContent}</textarea>
-                    <p><a href="${telegramLink}" target="_blank">Clicca qui per aprire Telegram e inviare il messaggio</a></p>
-                    <p>Copia il testo qui sopra e incollalo su Telegram se il link non funziona direttamente.</p>
                 `;
             }
         }
