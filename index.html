@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confronto Prezzi Reparti</title>
+    <style>
+        /* Qui inizia il CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="number"], input[type="date"], select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            appearance: none; /* Rimuove lo stile predefinito di alcuni browser per select e input date */
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px; /* Spazio per l'icona */
+        }
+        /* Icona per il select */
+        select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.8c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%204.6%201.8%208.9%205.4%2012.5l128%20127.9c3.6%203.6%207.8%205.4%2012.5%205.4s8.9-1.8%2012.5-5.4L287%2094.7c3.6-3.6%205.4-7.8%205.4-12.5c0-4.6-1.8-8.9-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+        }
+
+
+        .button-group {
+            display: flex;
+            flex-direction: column; /* Impila i pulsanti verticalmente */
+            gap: 10px; /* Spazio tra i pulsanti */
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%; /* I pulsanti occupano tutta la larghezza */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-telegram {
+            background-color: #0088cc; /* Colore tipico di Telegram */
+        }
+
+        .button-telegram:hover {
+            background-color: #006699;
+        }
+
+        .result-message {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-align: left;
+            white-space: pre-wrap; /* Mantiene la formattazione del testo, inclusi i salti di riga */
+            word-wrap: break-word; /* Spezza le parole lunghe */
+        }
+        /* Qui finisce il CSS */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Confronto Prezzi Reparti</h1>
+        <p>Inserisci i prezzi medi delle merci per ogni reparto, seleziona il tuo punto vendita e la data del report.</p>
+
+        <form id="priceForm">
+            <div class="form-group">
+                <label for="storeSelect">Seleziona il Punto Vendita:</label>
+                <select id="storeSelect" required>
+                    <option value="">-- Seleziona --</option>
+                    <option value="Fano">Fano</option>
+                    <option value="Monsano">Monsano</option>
+                    <option value="Osimo">Osimo</option>
+                    <option value="Macerata">Macerata</option>
+                    <option value="Civitanova">Civitanova</option>
+                    <option value="Pesaro">Pesaro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="reportDate">Data del Report:</label>
+                <input type="date" id="reportDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="clima">Clima (€):</label>
+                <input type="number" id="clima" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="bianco">Bianco (€):</label>
+                <input type="number" id="bianco" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="bruno">Bruno (€):</label>
+                <input type="number" id="bruno" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="smartphone">Smartphone (€):</label>
+                <input type="number" id="smartphone" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="informatica">Informatica (€):</label>
+                <input type="number" id="informatica" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile (€):</label>
+                <input type="number" id="mobile" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="ped">PED (€):</label>
+                <input type="number" id="ped" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="totale">Totale (€):</label>
+                <input type="number" id="totale" step="0.01" required>
+            </div>
+
+            <div class="button-group">
+                <button type="button" onclick="generateMessage('email')">Genera Messaggio Email</button>
+                <button type="button" onclick="generateMessage('telegram')" class="button-telegram">Invia tramite Telegram</button>
+            </div>
+        </form>
+
+        <div id="result" class="result-message"></div>
+    </div>
+
+    <script>
+        /* Qui inizia il JavaScript */
+        // Prezzi medi della catena (VALORI FISSI) - MODIFICA QUESTI VALORI CON I TUOI REALI!
+        const fixedPrices = {
+            clima: 157.00,       // Esempio
+            bianco: 440.00,      // Esempio
+            bruno: 298.00,       // Esempio
+            smartphone: 323.00,  // Esempio
+            informatica: 268.00, // Esempio
+            mobile: 172.00,      // Esempio
+            ped: 80.00,         // Esempio
+            totale: 78.00      // Esempio (somma o valore complessivo)
+        };
+
+        function generateMessage(type) {
+            const storeSelectElement = document.getElementById("storeSelect");
+            const selectedStore = storeSelectElement.value;
+
+            const dateInputElement = document.getElementById("reportDate");
+            const selectedDate = dateInputElement.value; // Formato YYYY-MM-DD
+
+            // Validazione del punto vendita e della data
+            if (selectedStore === "") {
+                alert("Per favore, seleziona il punto vendita.");
+                return;
+            }
+            if (selectedDate === "") {
+                alert("Per favore, seleziona la data del report.");
+                return;
+            }
+
+            // Formattare la data per il messaggio (es. DD/MM/YYYY)
+            const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
+
+            // Mapping dei nomi dei reparti per il messaggio
+            const departments = {
+                clima: "Clima",
+                bianco: "Bianco",
+                bruno: "Bruno",
+                smartphone: "Smartphone",
+                informatica: "Informatica",
+                mobile: "Mobile",
+                ped: "PED",
+                totale: "Totale"
+            };
+
+            let messageContent = `Report Confronto Prezzi Reparti - ${selectedStore} - Data: ${formattedDate}\n\n`;
+            messageContent += `Gentile Direzione,\n\nIl punto vendita ${selectedStore} ha compilato il report per la data ${formattedDate}. Di seguito il confronto dei prezzi medi dei reparti:\n\n`;
+
+            let allPricesValid = true;
+
+            for (const key in departments) {
+                const inputElement = document.getElementById(key);
+                const enteredPrice = parseFloat(inputElement.value);
+
+                if (isNaN(enteredPrice)) {
+                    alert(`Per favore, inserisci un valore numerico valido per ${departments[key]}.`);
+                    allPricesValid = false;
+                    break;
+                }
+
+                const fixedPrice = fixedPrices[key];
+                const difference = enteredPrice - fixedPrice;
+                const differenceText = difference.toFixed(2);
+
+                let line = `${departments[key]}: `;
+                if (difference > 0) {
+                    line += `Il prezzo è superiore al prezzo medio della catena di ${differenceText} €.\n`;
+                } else if (difference < 0) {
+                    line += `Il prezzo è inferiore al prezzo medio della catola di ${Math.abs(differenceText)} €.\n`;
+                } else {
+                    line += `Il prezzo è uguale al prezzo medio della catena.\n`;
+                }
+                messageContent += line;
+            }
+
+            if (!allPricesValid) {
+                return; // Ferma l'esecuzione se ci sono campi invalidi
+            }
+
+            messageContent += `\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
+
+            const resultDiv = document.getElementById("result");
+
+            if (type === 'email') {
+                const emailTo = "d.pavoni@dml-italia.com";
+                const subject = `Report Confronto Prezzi Reparti - ${selectedStore} - ${formattedDate}`; // Oggetto con data
+                const mailtoLink = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageContent)}`;
+
+                resultDiv.innerHTML = `
+                    <p>Messaggio email pronto!</p>
+                    <textarea rows="10" cols="50" readonly>${messageContent}</textarea>
+                    <p><a href="${mailtoLink}">Clicca qui per aprire la tua applicazione email</a></p>
+                    <p>In alternativa, copia il testo qui sopra e incollalo nella tua email.</p>
+                `;
+            } else if (type === 'telegram') {
+                const telegramLink = `https://t.me/share/url?url=&text=${encodeURIComponent(messageContent)}`;
+
+                resultDiv.innerHTML = `
+                    <p>Messaggio Telegram pronto!</p>
+                    <textarea rows="10" cols="50" readonly>${messageContent}</textarea>
+                    <p><a href="${telegramLink}" target="_blank">Clicca qui per aprire Telegram e inviare il messaggio</a></p>
+                    <p>Copia il testo qui sopra e incollalo su Telegram se il link non funziona direttamente.</p>
+                `;
+            }
+        }
+        /* Qui finisce il JavaScript */
+    </script>
+</body>
+</html>
