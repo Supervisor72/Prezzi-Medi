@@ -234,42 +234,44 @@
     </div>
 
     <script>
+        // Struttura dei dati corretta in italiano
         let fixedPrices = {
-            accessori: 0, clima: 0, bianco: 0, bruno: 0, grigio: 0, informatica: 0, consolle: 0, mobility: 0, ped: 0, servicios: 0, totale: 0
+            accessori: 0, clima: 0, bianco: 0, bruno: 0, grigio: 0, informatica: 0, consolle: 0, mobility: 0, ped: 0, servizi: 0, totale: 0
         };
 
+        // URL forzato per scaricare il CSV direttamente dal tuo ID foglio
         const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/15dgQAfwesj3FBtBuW0oZU-L0_yAwZbBaFxi_zEWw1Uo/pub?output=csv";
 
         async function loadPricesFromSheet() {
             try {
                 const response = await fetch(sheetCsvUrl);
-                const csvText = await response.text();
+                if (!response.ok) throw new Error('Network response was not ok');
                 
+                const csvText = await response.text();
                 const lines = csvText.split(/\r?\n/);
+                
                 lines.forEach(line => {
                     if (!line.trim()) return;
 
-                    const columns = line.split(',');
+                    // Gestiamo sia la divisione per virgola sia per punto e virgola
+                    const columns = line.includes(';') ? line.split(';') : line.split(',');
+                    
                     if (columns.length >= 2) {
                         const key = columns[0].trim().toLowerCase();
                         
-                        // Pulizia totale della stringa per eliminare punti, virgole e simboli e ricavare solo cifre intere
-                        let cleanString = columns[1].trim().replace(/[,.]/g, '');
-                        
-                        // Se il foglio conteneva un valore tipo "150,00", rimuovendo la virgola diventa "15000".
-                        // Verifichiamo se l'originale conteneva virgole o punti decimali per fare un arrotondamento all'unità corretto.
-                        let originalValue = parseFloat(columns[1].trim().replace(',', '.'));
-                        const value = !isNaN(originalValue) ? Math.round(originalValue) : NaN;
+                        // Pulizia e conversione all'intero più vicino
+                        let rawValue = columns[1].trim().replace(/"/g, '').replace(',', '.');
+                        const value = Math.round(parseFloat(rawValue));
 
                         if (key in fixedPrices && !isNaN(value)) {
                             fixedPrices[key] = value;
                         }
                     }
                 });
-                console.log("Prezzi di riferimento (interi) caricati correttamente:", fixedPrices);
+                console.log("Prezzi benchmark (Interi) caricati con successo:", fixedPrices);
             } catch (error) {
-                console.error("Errore nel caricamento prezzi:", error);
-                alert("Attenzione: impossibile caricare i prezzi di riferimento aggiornati.");
+                console.error("Errore nel caricamento dei dati:", error);
+                alert("Attenzione: impossibile caricare i prezzi di riferimento aggiornati. Verifica che il file Google Sheet sia 'Pubblicato sul Web'.");
             }
         }
 
@@ -311,7 +313,6 @@
 
             for (const key in departments) {
                 const inputElement = document.getElementById(key);
-                // Leggiamo l'input inserito a schermo e lo arrotondiamo all'intero più vicino
                 const enteredPrice = Math.round(parseFloat(inputElement.value));
 
                 if (isNaN(enteredPrice)) {
@@ -321,9 +322,9 @@
                 }
 
                 const fixedPrice = fixedPrices[key];
-                const difference = enteredPrice - fixedPrice; // Calcolo pulito tra numeri interi
+                const difference = enteredPrice - fixedPrice;
 
-                // Esporta nel report SOLO se è strettamente inferiore alla media (differenza minore di 0)
+                // Mostra il reparto SOLO se il valore inserito è minore di quello di riferimento
                 if (difference < 0) {
                     let line = `🔴 ${departments[key]}: Prezzo inferiore al prezzo medio DML di ${Math.abs(difference)} €`;
                     subMediaDetails.push(line);
