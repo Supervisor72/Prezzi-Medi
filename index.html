@@ -13,7 +13,6 @@
             --telegram-color: #0088cc;
             --telegram-hover: #006699;
             --background-light: #f8f9fa;
-            --background-medium: #e9ecef;
             --text-dark: #343a40;
             --text-medium: #6c757d;
             --border-light: #ced4da;
@@ -88,8 +87,6 @@
             color: var(--text-dark);
             background-color: #fff;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
         }
 
@@ -234,48 +231,55 @@
     </div>
 
     <script>
-        // Mappa dei prezzi di riferimento interni
+        // Mappa interna dei prezzi benchmark
         let fixedPrices = {
             accessori: 0, clima: 0, bianco: 0, bruno: 0, grigio: 0, informatica: 0, consolle: 0, mobility: 0, ped: 0, servizi: 0, totale: 0
         };
 
-        const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/15dgQAfwesj3FBtBuW0oZU-L0_yAwZbBaFxi_zEWw1Uo/pub?output=csv";
+        // Utilizziamo l'endpoint di visualizzazione dati di Google che non soffre dei blocchi di sicurezza dei browser
+        const spreadsheetId = "15dgQAfwesj3FBtBuW0oZU-L0_yAwZbBaFxi_zEWw1Uo";
+        const jsonUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json`;
 
         async function loadPricesFromSheet() {
             try {
-                const response = await fetch(sheetCsvUrl);
-                if (!response.ok) throw new Error('Risposta di rete non valida');
+                const response = await fetch(jsonUrl);
+                const text = await response.text();
                 
-                const csvText = await response.text();
-                const lines = csvText.split(/\r?\n/);
+                // Google gviz restituisce una stringa con del testo extra all'inizio e alla fine, la puliamo per avere un JSON valido
+                const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+                const data = JSON.parse(jsonString);
                 
-                lines.forEach(line => {
-                    if (!line.trim()) return;
-
-                    // Supporto sia per separatore virgola (,) che punto e virgola (;)
-                    const columns = line.includes(';') ? line.split(';') : line.split(',');
-                    
-                    if (columns.length >= 2) {
-                        // Pulizia totale della chiave testuale (es. rimuove spazi e trasforma in minuscolo)
-                        const key = columns[0].trim().toLowerCase().replace(/[^a-z]/g, '');
+                const rows = data.table.rows;
+                
+                rows.forEach(row => {
+                    // Controlla che la riga abbia elementi validi nella colonna A (nome) e B (valore)
+                    if (row.c && row.c[0] && row.c[1]) {
+                        let rawKey = row.c[0].v;
+                        let rawValue = row.c[1].v;
                         
-                        // Salta le righe di intestazione generiche del foglio
-                        if (key === "reparto" || key === "prezzo" || key === "valore" || key === "prezzomedio") return;
+                        if (rawKey) {
+                            let key = rawKey.toString().trim().toLowerCase();
+                            
+                            // Gestione sinonimi per evitare disallineamenti di battitura tra foglio e codice
+                            if (key === "mobile") key = "mobility";
+                            
+                            // Se il valore estratto è stringa (es. "150,00"), puliamo i decimali
+                            let cleanValue = typeof rawValue === 'string' 
+                                ? rawValue.replace(/[\s€]/g, '').replace(',', '.') 
+                                : rawValue;
+                                
+                            const value = Math.round(parseFloat(cleanValue));
 
-                        // Estrazione pulita del numero: toglie valute (€), spazi, gestisce la virgola decimale italiana
-                        let rawValue = columns[1].trim().replace(/[\s€]/g, '').replace(',', '.');
-                        const value = Math.round(parseFloat(rawValue));
-
-                        // Se la chiave corrisponde a un reparto monitorato ed è un numero valido, la salva
-                        if (key in fixedPrices && !isNaN(value)) {
-                            fixedPrices[key] = value;
+                            if (key in fixedPrices && !isNaN(value)) {
+                                fixedPrices[key] = value;
+                            }
                         }
                     }
                 });
-                console.log("Prezzi benchmark interi caricati:", fixedPrices);
+                console.log("Prezzi benchmark (Interi) sincronizzati con successo:", fixedPrices);
             } catch (error) {
-                console.error("Errore analisi dati:", error);
-                alert("Attenzione: impossibile sincronizzare i prezzi. Verifica che il file Google Sheet sia configurato come 'Pubblicato sul Web'.");
+                console.error("Errore durante l'importazione:", error);
+                alert("Sincronizzazione fallita. Ricorda di impostare la visibilità del foglio su 'Chiunque abbia il link può visualizzare' per consentire l'accesso al codice.");
             }
         }
 
@@ -284,7 +288,6 @@
         function generateMessageContent() {
             const storeSelectElement = document.getElementById("storeSelect");
             const selectedStore = storeSelectElement.value;
-
             const dateInputElement = document.getElementById("reportDate");
             const selectedDate = dateInputElement.value;
 
@@ -301,7 +304,7 @@
                 grigio: "Grigio",
                 informatica: "Informatica",
                 consolle: "Consolle",
-                mobility: "Mobility",
+                mobility: "Mobile",
                 ped: "PED",
                 servizi: "Servizi",
                 totale: "Totale"
@@ -328,7 +331,7 @@
                 const fixedPrice = fixedPrices[key];
                 const difference = enteredPrice - fixedPrice;
 
-                // Cattura rigorosamente solo i valori inferiori alla media (delta negativo)
+                // Estrai e mostra esclusivamente le criticità inferiori alla media
                 if (difference < 0) {
                     let line = `🔴 ${departments[key]}: Prezzo inferiore al prezzo medio DML di ${Math.abs(difference)} €`;
                     subMediaDetails.push(line);
