@@ -234,18 +234,17 @@
     </div>
 
     <script>
-        // Struttura dei dati corretta in italiano
+        // Mappa dei prezzi di riferimento interni
         let fixedPrices = {
             accessori: 0, clima: 0, bianco: 0, bruno: 0, grigio: 0, informatica: 0, consolle: 0, mobility: 0, ped: 0, servizi: 0, totale: 0
         };
 
-        // URL forzato per scaricare il CSV direttamente dal tuo ID foglio
         const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/15dgQAfwesj3FBtBuW0oZU-L0_yAwZbBaFxi_zEWw1Uo/pub?output=csv";
 
         async function loadPricesFromSheet() {
             try {
                 const response = await fetch(sheetCsvUrl);
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) throw new Error('Risposta di rete non valida');
                 
                 const csvText = await response.text();
                 const lines = csvText.split(/\r?\n/);
@@ -253,25 +252,30 @@
                 lines.forEach(line => {
                     if (!line.trim()) return;
 
-                    // Gestiamo sia la divisione per virgola sia per punto e virgola
+                    // Supporto sia per separatore virgola (,) che punto e virgola (;)
                     const columns = line.includes(';') ? line.split(';') : line.split(',');
                     
                     if (columns.length >= 2) {
-                        const key = columns[0].trim().toLowerCase();
+                        // Pulizia totale della chiave testuale (es. rimuove spazi e trasforma in minuscolo)
+                        const key = columns[0].trim().toLowerCase().replace(/[^a-z]/g, '');
                         
-                        // Pulizia e conversione all'intero più vicino
-                        let rawValue = columns[1].trim().replace(/"/g, '').replace(',', '.');
+                        // Salta le righe di intestazione generiche del foglio
+                        if (key === "reparto" || key === "prezzo" || key === "valore" || key === "prezzomedio") return;
+
+                        // Estrazione pulita del numero: toglie valute (€), spazi, gestisce la virgola decimale italiana
+                        let rawValue = columns[1].trim().replace(/[\s€]/g, '').replace(',', '.');
                         const value = Math.round(parseFloat(rawValue));
 
+                        // Se la chiave corrisponde a un reparto monitorato ed è un numero valido, la salva
                         if (key in fixedPrices && !isNaN(value)) {
                             fixedPrices[key] = value;
                         }
                     }
                 });
-                console.log("Prezzi benchmark (Interi) caricati con successo:", fixedPrices);
+                console.log("Prezzi benchmark interi caricati:", fixedPrices);
             } catch (error) {
-                console.error("Errore nel caricamento dei dati:", error);
-                alert("Attenzione: impossibile caricare i prezzi di riferimento aggiornati. Verifica che il file Google Sheet sia 'Pubblicato sul Web'.");
+                console.error("Errore analisi dati:", error);
+                alert("Attenzione: impossibile sincronizzare i prezzi. Verifica che il file Google Sheet sia configurato come 'Pubblicato sul Web'.");
             }
         }
 
@@ -324,7 +328,7 @@
                 const fixedPrice = fixedPrices[key];
                 const difference = enteredPrice - fixedPrice;
 
-                // Mostra il reparto SOLO se il valore inserito è minore di quello di riferimento
+                // Cattura rigorosamente solo i valori inferiori alla media (delta negativo)
                 if (difference < 0) {
                     let line = `🔴 ${departments[key]}: Prezzo inferiore al prezzo medio DML di ${Math.abs(difference)} €`;
                     subMediaDetails.push(line);
