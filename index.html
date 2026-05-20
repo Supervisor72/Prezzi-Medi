@@ -234,14 +234,17 @@
     </div>
 
     <script>
+        // Prezzi di riferimento dinamici (caricati da Sheets)
         let fixedPrices = {
             accessori: 0, clima: 0, bianco: 0, bruno: 0, grigio: 0, informatica: 0, consolle: 0, mobility: 0, ped: 0, servizi: 0, totale: 0
         };
 
+        // URL del CSV esportato dal tuo Google Sheet
         const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS6y_tZ5g3bZzV3r5N3hK6b6E8Tz1W5rA9B6Hn-fXW8yU6h5j6B-v7g3R5nZ9p8w4L8XW5b3Z9m8Qv8/pub?output=csv";
 
         async function loadPricesFromSheet() {
             try {
+                // Sostituisce /edit con /pub?output=csv se necessario
                 const targetUrl = sheetCsvUrl.includes("/edit") 
                     ? sheetCsvUrl.replace(/\/edit.*/, "/pub?output=csv") 
                     : sheetCsvUrl;
@@ -269,6 +272,7 @@
 
         window.onload = loadPricesFromSheet;
 
+
         function generateMessageContent() {
             const storeSelectElement = document.getElementById("storeSelect");
             const selectedStore = storeSelectElement.value;
@@ -295,13 +299,13 @@
                 totale: "Totale"
             };
 
-            let messageContent = `🚩 Report Criticità: Prezzi Reparti Sottomedia\n\n`;
+            let messageContent = `🚩 Report Confronto Prezzi Reparti\n\n`;
             messageContent += `📍 Punto Vendita: ${selectedStore}\n`;
             messageContent += `🗓️ Data Report: ${formattedDate}\n\n`;
-            messageContent += `Di seguito l'elenco dei soli reparti risultati SOTTOMEDIA rispetto al benchmark della catena:\n\n`;
+            messageContent += `Di seguito il confronto dei prezzi medi:\n\n`;
 
             let allPricesValid = true;
-            let subMediaDetails = [];
+            let comparisonDetails = [];
 
             for (const key in departments) {
                 const inputElement = document.getElementById(key);
@@ -318,22 +322,23 @@
                 const differenceText = difference.toFixed(2);
                 let formattedDifference = differenceText.endsWith('.00') ? differenceText.slice(0, -3) : differenceText;
 
-                // Salva nel report ed esporta solo se è inferiore alla media (differenza negativa)
-                if (difference < 0) {
-                    let line = `🔴 ${departments[key]}: Prezzo inferiore al prezzo medio DML di ${Math.abs(formattedDifference)} €`;
-                    subMediaDetails.push(line);
+                let line = `${departments[key]}: `;
+                if (difference > 0) {
+                    // VERDE + ICONA + TESTO PER SUPERIORE
+                    line = `🟢 ${departments[key]}: SUPERIORE al prezzo medio DML di ${formattedDifference} €`;
+                } else if (difference < 0) {
+                    // ROSSO + ICONA + TESTO PER INFERIORE
+                    line = `🔴 ${departments[key]}: SOTTOMEDIA rispetto al prezzo medio DML di ${Math.abs(formattedDifference)} €`;
+                } else {
+                    // VERDE + ICONA + TESTO PER UGUALE
+                    line = `🟢 ${departments[key]}: UGUALE al prezzo medio della catena`;
                 }
+                comparisonDetails.push(line);
             }
 
             if (!allPricesValid) return null;
 
-            // Se non ci sono reparti sottomedia, inseriamo una nota positiva
-            if (subMediaDetails.length === 0) {
-                messageContent += `✅ Ottimo! Nessun reparto risulta sottomedia rispetto alla media aziendale.`;
-            } else {
-                messageContent += subMediaDetails.join('\n');
-            }
-
+            messageContent += comparisonDetails.join('\n');
             messageContent += `\n\n---\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
 
             return messageContent;
@@ -351,7 +356,7 @@
 
             if (type === 'email') {
                 const emailTo = "d.pavoni@dml-italia.com";
-                const subject = `⚠️ Report Criticità Prezzi Sottomedia - ${selectedStore} - ${formattedDate}`;
+                const subject = `📊 Report Confronto Prezzi Reparti - ${selectedStore} - ${formattedDate}`;
                 window.location.href = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageContent)}`;
             } else if (type === 'telegram') {
                 const telegramLink = `https://t.me/share/url?url=&text=${encodeURIComponent(messageContent)}`;
