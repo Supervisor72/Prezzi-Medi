@@ -74,13 +74,14 @@ async function loadCat(){
 loadCat();
 function build(){
  const p=$("pdv").value;if(!p){say("Seleziona il PDV.",1);return null}
- const L=[],miss=[];let n=0;
+ const L=[],miss=[];let n=0,calc=0;
  document.querySelectorAll("#rows input").forEach(inp=>{const v=num(inp.value);if(v==null)return;n++;
   const r=REPARTI[inp.dataset.i],m=MEDIA_CATENA[r];
   if(m==null){miss.push(r);return}
-  const d=v-m;L.push(r+": "+(d>=0?"+":"-")+eur(Math.abs(d))+" €")});
+  const d=v-m;calc++;if(Math.round(d*100)<0)L.push(r+": -"+eur(Math.abs(d))+" €")});
  if(!n){say("Inserisci almeno un prezzo.",1);return null}
- if(!L.length){say("Media catena non disponibile: impossibile calcolare la differenza.",1);return null}
+ if(!calc){say("Media catena non disponibile: impossibile calcolare la differenza.",1);return null}
+ if(!L.length)L.push("Nessun reparto sotto la media catena.")
  return{p,t:"PREZZI MEDI REPARTO - "+p+" - "+new Date().toLocaleDateString("it-IT")+"\n\n"+L.join("\n")}}
 function say(t,e){const m=$("msg");m.textContent=t;m.style.color=e?"var(--bad)":"var(--ok)"}
 $("ml").onclick=()=>{const b=build();if(!b)return;
