@@ -1,375 +1,91 @@
 <!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifica Delta Prezzi Medi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Modern Reset & Base Styles */
-        :root {
-            --primary-color: #4A90E2;
-            --primary-hover: #357ABD;
-            --telegram-color: #0088cc;
-            --telegram-hover: #006699;
-            --background-light: #f8f9fa;
-            --text-dark: #343a40;
-            --text-medium: #6c757d;
-            --border-light: #ced4da;
-            --border-radius: 8px;
-            --shadow-light: rgba(0, 0, 0, 0.08);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            line-height: 1.6;
-            color: var(--text-dark);
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 20px var(--shadow-light);
-            width: 100%;
-            max-width: 550px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: var(--text-dark);
-            margin-bottom: 20px;
-            font-size: 2em;
-            font-weight: 700;
-        }
-
-        p {
-            color: var(--text-medium);
-            margin-bottom: 30px;
-            font-size: 1.1em;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 0.95em;
-        }
-
-        label .icon {
-            margin-right: 8px;
-            font-size: 1.1em;
-            vertical-align: middle;
-        }
-
-        input[type="number"],
-        input[type="date"],
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            box-sizing: border-box;
-            font-size: 1em;
-            color: var(--text-dark);
-            background-color: #fff;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            appearance: none;
-        }
-
-        input[type="number"]:focus,
-        input[type="date"]:focus,
-        select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-            outline: none;
-        }
-
-        select {
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c757d%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.8c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%204.6%201.8%208.9%205.4%2012.5l128%20127.9c3.6%203.6%207.8%205.4%2012.5%205.4s8.9-1.8%2012.5-5.4L287%2094.7c3.6-3.6%205.4-7.8%205.4-12.5c0-4.6-1.8-8.9-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 10px;
-            padding-right: 40px;
-        }
-
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 14px 25px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            letter-spacing: 0.5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        button .icon {
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .button-telegram {
-            background-color: var(--telegram-color);
-        }
-
-        .button-telegram:hover {
-            background-color: var(--telegram-hover);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Verifica Delta Prezzi Medi</h1>
-        <p>Inserisci i prezzi medi delle merci per ogni reparto (Valori Interi).</p>
-
-        <form id="priceForm">
-            <div class="form-group">
-                <label for="storeSelect"><span class="icon">📍</span> Seleziona il Punto Vendita:</label>
-                <select id="storeSelect" required>
-                    <option value="">-- Seleziona --</option>
-                    <option value="Fano">Fano</option>
-                    <option value="Monsano">Monsano</option>
-                    <option value="Osimo">Osimo</option>
-                    <option value="Macerata">Macerata</option>
-                    <option value="Civitanova">Civitanova</option>
-                    <option value="Pesaro">Pesaro</option>
-                    <option value="Foligno">Foligno</option>                    
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="reportDate"><span class="icon">🗓️</span> Data del Report:</label>
-                <input type="date" id="reportDate" required>
-            </div>
-
-            <div class="form-group">
-                <label for="accessori"><span class="icon">🎧</span> Accessori (€):</label>
-                <input type="number" id="accessori" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="clima"><span class="icon">❄️</span> Clima (€):</label>
-                <input type="number" id="clima" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="bianco"><span class="icon">🧺</span> Bianco (€):</label>
-                <input type="number" id="bianco" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="bruno"><span class="icon">📺</span> Bruno (€):</label>
-                <input type="number" id="bruno" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="grigio"><span class="icon">📱</span> Grigio (€):</label>
-                <input type="number" id="grigio" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="informatica"><span class="icon">💻</span> Informatica (€):</label>
-                <input type="number" id="informatica" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="consolle"><span class="icon">🎮</span> Consolle (€):</label>
-                <input type="number" id="consolle" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="mobility"><span class="icon">🚲</span> Mobile (€):</label>
-                <input type="number" id="mobility" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="ped"><span class="icon">🍳</span> PED (€):</label>
-                <input type="number" id="ped" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="servizi"><span class="icon">🛠️</span> Servizi (€):</label>
-                <input type="number" id="servizi" pattern="[0-9]*" required>
-            </div>
-            <div class="form-group">
-                <label for="totale"><span class="icon">📊</span> Totale (€):</label>
-                <input type="number" id="totale" pattern="[0-9]*" required>
-            </div>
-
-            <div class="button-group">
-                <button type="button" onclick="generateAndSend('email')"><span class="icon">📧</span> Invia Report tramite Email</button>
-                <button type="button" onclick="generateAndSend('telegram')" class="button-telegram"><span class="icon">✈️</span> Invia Report tramite Telegram</button>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        // Mappa interna dei prezzi benchmark
-        let fixedPrices = {
-            accessori: 0, clima: 0, bianco: 0, bruno: 0, grigio: 0, informatica: 0, consolle: 0, mobility: 0, ped: 0, servizi: 0, totale: 0
-        };
-
-        // Utilizziamo l'endpoint di visualizzazione dati di Google che non soffre dei blocchi di sicurezza dei browser
-        const spreadsheetId = "15dgQAfwesj3FBtBuW0oZU-L0_yAwZbBaFxi_zEWw1Uo";
-        const jsonUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json`;
-
-        async function loadPricesFromSheet() {
-            try {
-                const response = await fetch(jsonUrl);
-                const text = await response.text();
-                
-                // Google gviz restituisce una stringa con del testo extra all'inizio e alla fine, la puliamo per avere un JSON valido
-                const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-                const data = JSON.parse(jsonString);
-                
-                const rows = data.table.rows;
-                
-                rows.forEach(row => {
-                    // Controlla che la riga abbia elementi validi nella colonna A (nome) e B (valore)
-                    if (row.c && row.c[0] && row.c[1]) {
-                        let rawKey = row.c[0].v;
-                        let rawValue = row.c[1].v;
-                        
-                        if (rawKey) {
-                            let key = rawKey.toString().trim().toLowerCase();
-                            
-                            // Gestione sinonimi per evitare disallineamenti di battitura tra foglio e codice
-                            if (key === "mobile") key = "mobility";
-                            
-                            // Se il valore estratto è stringa (es. "150,00"), puliamo i decimali
-                            let cleanValue = typeof rawValue === 'string' 
-                                ? rawValue.replace(/[\s€]/g, '').replace(',', '.') 
-                                : rawValue;
-                                
-                            const value = Math.round(parseFloat(cleanValue));
-
-                            if (key in fixedPrices && !isNaN(value)) {
-                                fixedPrices[key] = value;
-                            }
-                        }
-                    }
-                });
-                console.log("Prezzi benchmark (Interi) sincronizzati con successo:", fixedPrices);
-            } catch (error) {
-                console.error("Errore durante l'importazione:", error);
-                alert("Sincronizzazione fallita. Ricorda di impostare la visibilità del foglio su 'Chiunque abbia il link può visualizzare' per consentire l'accesso al codice.");
-            }
-        }
-
-        window.onload = loadPricesFromSheet;
-
-        function generateMessageContent() {
-            const storeSelectElement = document.getElementById("storeSelect");
-            const selectedStore = storeSelectElement.value;
-            const dateInputElement = document.getElementById("reportDate");
-            const selectedDate = dateInputElement.value;
-
-            if (selectedStore === "") { alert("Per favore, seleziona il punto vendita."); return null; }
-            if (selectedDate === "") { alert("Per favore, seleziona la data del report."); return null; }
-
-            const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
-
-            const departments = {
-                accessori: "Accessori",
-                clima: "Clima",
-                bianco: "Bianco",
-                bruno: "Bruno",
-                grigio: "Grigio",
-                informatica: "Informatica",
-                consolle: "Consolle",
-                mobility: "Mobile",
-                ped: "PED",
-                servizi: "Servizi",
-                totale: "Totale"
-            };
-
-            let messageContent = `🚩 Report Criticità: Prezzi Reparti Sottomedia\n\n`;
-            messageContent += `📍 Punto Vendita: ${selectedStore}\n`;
-            messageContent += `🗓️ Data Report: ${formattedDate}\n\n`;
-            messageContent += `Di seguito l'elenco dei soli reparti risultati SOTTOMEDIA rispetto al benchmark della catena:\n\n`;
-
-            let allPricesValid = true;
-            let subMediaDetails = [];
-
-            for (const key in departments) {
-                const inputElement = document.getElementById(key);
-                const enteredPrice = Math.round(parseFloat(inputElement.value));
-
-                if (isNaN(enteredPrice)) {
-                    alert(`Per favore, inserisci un valore numerico valido per ${departments[key]}.`);
-                    allPricesValid = false;
-                    break;
-                }
-
-                const fixedPrice = fixedPrices[key];
-                const difference = enteredPrice - fixedPrice;
-
-                // Estrai e mostra esclusivamente le criticità inferiori alla media
-                if (difference < 0) {
-                    let line = `🔴 ${departments[key]}: Prezzo inferiore al prezzo medio DML di ${Math.abs(difference)} €`;
-                    subMediaDetails.push(line);
-                }
-            }
-
-            if (!allPricesValid) return null;
-
-            if (subMediaDetails.length === 0) {
-                messageContent += `✅ Ottimo! Nessun reparto risulta sottomedia rispetto alla media aziendale.`;
-            } else {
-                messageContent += subMediaDetails.join('\n');
-            }
-
-            messageContent += `\n\n---\nCordiali saluti,\nIl tuo punto vendita ${selectedStore}`;
-
-            return messageContent;
-        }
-
-        function generateAndSend(type) {
-            const messageContent = generateMessageContent();
-            if (!messageContent) return;
-
-            const storeSelectElement = document.getElementById("storeSelect");
-            const selectedStore = storeSelectElement.value;
-            const dateInputElement = document.getElementById("reportDate");
-            const selectedDate = dateInputElement.value;
-            const formattedDate = new Date(selectedDate).toLocaleDateString('it-IT');
-
-            if (type === 'email') {
-                const emailTo = "d.pavoni@dml-italia.com";
-                const subject = `⚠️ Report Criticità Prezzi Sottomedia - ${selectedStore} - ${formattedDate}`;
-                window.location.href = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageContent)}`;
-            } else if (type === 'telegram') {
-                const telegramLink = `https://t.me/share/url?url=&text=${encodeURIComponent(messageContent)}`;
-                window.open(telegramLink, '_blank');
-            }
-        }
-    </script>
-</body>
-</html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prezzi medi per reparto - DML</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f14;--card:#161a22;--line:#232936;--in:#2a3140;--gold:#e8b84b;--g1:#b8860b;--g2:#c9971f;--ink:#e9ecf2;--mut:#8a93a6;--ok:#3ecf8e;--bad:#ef5350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "DM Sans",Arial,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:640px;margin:0 auto;padding:18px 16px 40px}
+.back{display:block;width:100%;text-align:center;text-decoration:none;font-weight:700;font-size:1.05rem;color:var(--gold);background:var(--card);border:1.5px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:22px}
+h1{font-size:1.6rem;margin:0 0 4px;color:var(--gold)}
+p.s{margin:0 0 20px;color:var(--mut)}
+label{display:block;font-weight:700;margin:0 0 8px}
+select,input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--in);border-radius:8px;padding:12px}
+input{font-family:"DM Mono",monospace}
+select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,184,75,.2)}
+button:focus-visible,.back:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.box{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 16px 12px;margin-bottom:16px}
+.box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g1),var(--gold),var(--g2))}
+.row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"nm cat" "in d";gap:8px 12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.nm{grid-area:nm;font-weight:700}
+.cat{grid-area:cat;text-align:right;font:500 .9rem "DM Mono",monospace;color:var(--gold);background:rgba(232,184,75,.08);border:1px solid var(--line);border-radius:6px;padding:4px 10px;user-select:none;-webkit-user-select:none}
+.cat i{font:normal .72rem "DM Sans",sans-serif;color:var(--mut);margin-right:6px}
+.row input{grid-area:in}
+.d{grid-area:d;text-align:right;min-width:80px;font:500 .95rem "DM Mono",monospace}
+.ro{color:var(--mut);font-size:.85rem;margin:0 0 10px}
+.up{color:var(--ok)}.dn{color:var(--bad)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+button{font:inherit;font-weight:700;border-radius:10px;padding:15px;cursor:pointer}
+#ml{border:0;color:#0d0f14;background:linear-gradient(135deg,var(--gold),var(--g2) 60%,var(--g1))}
+#tg{color:var(--gold);background:transparent;border:1.5px solid var(--gold)}
+#msg{min-height:1.4em;margin-top:14px;font-weight:700}
+</style></head><body><main>
+<a class="back" id="back" href="#">← Torna alla Home Hub</a>
+<h1>Prezzi medi per reparto</h1>
+<p class="s">Scegli il tuo PDV, inserisci i prezzi medi e invia.</p>
+<div class="box"><label for="pdv">Punto vendita</label>
+<select id="pdv"></select></div>
+<div class="box"><div id="rows"></div></div>
+<div class="acts"><button id="tg" type="button">Invia su Telegram</button><button id="ml" type="button">Invia via mail</button></div>
+<div id="msg" role="status"></div>
+</main>
+<script>
+// ===== CONFIGURAZIONE =====
+const MAIL_TO="d.pavoni@dml-italia.com";
+const TG_USERNAME="";   // tuo username Telegram, senza @ (se vuoto: il PDV sceglie il destinatario)
+const HUB_URL="";      // link alla Home Hub (se vuoto: torna indietro)
+const REPARTI=["CLIMA", "BIANCO", "BRUNO", "GRIGIO", "INFORMATICA", "MOBILITY", "PED"];
+let MEDIA_CATENA={};   // es. {"TV":489.90,"Telefonia":312.50}  (dal file Excel)
+const PDV=["AVEZZANO", "BOLOGNA", "CARPI", "CESENA", "CHIOGGIA", "CITTÀ DI CASTELLO", "CIVITANOVA", "CONEGLIANO", "FABRIANO", "FAENZA", "FANO", "FOLIGNO", "FORLÌ", "IMOLA", "L'AQUILA", "LANCIANO", "MACERATA", "MARANELLO", "MONSANO", "OSIMO", "PADOVA", "PERUGIA", "PESARO", "PESCARA", "REGGIO EMILIA", "RIETI", "RIMINI", "ROMA", "SAN BENEDETTO", "SAN MARINO", "SANTA MARIA DI SALA", "TERAMO", "TERMOLI", "VASTO", "VICENZA", "VITERBO"];
+// ==========================
+const $=id=>document.getElementById(id);
+$("back").onclick=e=>{e.preventDefault();HUB_URL?location.href=HUB_URL:history.back()};
+const eur=n=>n.toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=v=>{const n=parseFloat(String(v).replace(/\./g,"").replace(",","."));return isNaN(n)?null:n};
+$("pdv").innerHTML='<option value="">Seleziona...</option>'+PDV.map(p=>`<option>${p}</option>`).join("");
+try{const s=localStorage.getItem("pdv");if(s)$("pdv").value=s}catch(e){}
+$("pdv").onchange=()=>{try{localStorage.setItem("pdv",$("pdv").value)}catch(e){}};
+$("rows").innerHTML='<p class="ro">La media catena è in sola lettura: la aggiorna la Direzione.</p>'+REPARTI.map((r,i)=>`<div class="row"><div class="nm">${r}</div><div class="cat" id="c${i}"><i>Media catena</i>-</div>
+<input inputmode="decimal" placeholder="Il tuo prezzo €" data-i="${i}" aria-label="Prezzo medio ${r}"><div class="d" id="d${i}"></div></div>`).join("");
+function delta(i){const r=REPARTI[i],inp=document.querySelector('#rows input[data-i="'+i+'"]'),v=num(inp.value),m=MEDIA_CATENA[r],el=$("d"+i);
+ if(v==null||m==null){el.textContent="";return}
+ const d=v-m;el.textContent=(d>=0?"+":"")+eur(d);el.className="d "+(d>=0?"up":"dn")}
+function paintCat(){REPARTI.forEach((r,i)=>{const m=MEDIA_CATENA[r];$("c"+i).innerHTML="<i>Media catena</i>"+(m!=null?"€ "+eur(m):"-");delta(i)})}
+document.querySelectorAll("#rows input").forEach(inp=>inp.oninput=()=>delta(inp.dataset.i));
+function loadCat(){
+ google.script.run.withSuccessHandler(d=>{if(d&&d.valori)MEDIA_CATENA=d.valori;paintCat()})
+  .withFailureHandler(()=>{say("Media catena non aggiornata.",1);paintCat()}).getDati()}
+loadCat();
+function build(){
+ const p=$("pdv").value;if(!p){say("Seleziona il PDV.",1);return null}
+ const L=[],miss=[];let n=0;
+ document.querySelectorAll("#rows input").forEach(inp=>{const v=num(inp.value);if(v==null)return;n++;
+  const r=REPARTI[inp.dataset.i],m=MEDIA_CATENA[r];
+  if(m==null){miss.push(r);return}
+  const d=v-m;L.push(r+": "+(d>=0?"+":"-")+eur(Math.abs(d))+" €")});
+ if(!n){say("Inserisci almeno un prezzo.",1);return null}
+ if(!L.length){say("Media catena non disponibile: impossibile calcolare la differenza.",1);return null}
+ return{p,t:"PREZZI MEDI REPARTO - "+p+" - "+new Date().toLocaleDateString("it-IT")+"\n\n"+L.join("\n")}}
+function say(t,e){const m=$("msg");m.textContent=t;m.style.color=e?"var(--bad)":"var(--ok)"}
+$("ml").onclick=()=>{const b=build();if(!b)return;
+ window.open("mailto:"+MAIL_TO+"?subject="+encodeURIComponent("Prezzi medi reparto - "+b.p)+"&body="+encodeURIComponent(b.t),"_top");say("Mail pronta: premi Invia nella tua app di posta.")};
+$("tg").onclick=async()=>{const b=build();if(!b)return;
+ try{await navigator.clipboard.writeText(b.t)}catch(e){}
+ const q=encodeURIComponent(b.t);
+ const url=TG_USERNAME?"https://t.me/"+TG_USERNAME+"?text="+q:"https://t.me/share/url?url=%20&text="+q;
+ window.open(url,"_blank");
+ say(TG_USERNAME?"Telegram aperto con il messaggio pronto. Se non compare, incollalo: è già copiato.":"Telegram aperto con il messaggio pronto: scegli il destinatario e invia.")};
+</script></body></html>
