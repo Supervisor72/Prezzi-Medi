@@ -8,14 +8,13 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "DM Sans",Arial,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 main{max-width:640px;margin:0 auto;padding:18px 16px 40px}
-.back{display:block;width:100%;text-align:center;text-decoration:none;font-weight:700;font-size:1.05rem;color:var(--gold);background:var(--card);border:1.5px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:22px}
 h1{font-size:1.6rem;margin:0 0 4px;color:var(--gold)}
 p.s{margin:0 0 20px;color:var(--mut)}
 label{display:block;font-weight:700;margin:0 0 8px}
 select,input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--in);border-radius:8px;padding:12px}
 input{font-family:"DM Mono",monospace}
 select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,184,75,.2)}
-button:focus-visible,.back:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .box{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 16px 12px;margin-bottom:16px}
 .box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g1),var(--gold),var(--g2))}
 .row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"nm cat" "in d";gap:8px 12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -33,7 +32,6 @@ button{font:inherit;font-weight:700;border-radius:10px;padding:15px;cursor:point
 #tg{color:var(--gold);background:transparent;border:1.5px solid var(--gold)}
 #msg{min-height:1.4em;margin-top:14px;font-weight:700}
 </style></head><body><main>
-<a class="back" id="back" href="#">← Torna alla Home Hub</a>
 <h1>Prezzi medi per reparto</h1>
 <p class="s">Scegli il tuo PDV, inserisci i prezzi medi e invia.</p>
 <div class="box"><label for="pdv">Punto vendita</label>
@@ -46,13 +44,13 @@ button{font:inherit;font-weight:700;border-radius:10px;padding:15px;cursor:point
 // ===== CONFIGURAZIONE =====
 const MAIL_TO="d.pavoni@dml-italia.com";
 const TG_USERNAME="";   // tuo username Telegram, senza @ (se vuoto: il PDV sceglie il destinatario)
-const HUB_URL="";      // link alla Home Hub (se vuoto: torna indietro)
-const REPARTI=["CLIMA", "BIANCO", "BRUNO", "GRIGIO", "INFORMATICA", "MOBILITY", "PED"];
+const REPARTI=["CLIMA","BIANCO","BRUNO","GRIGIO","INFORMATICA","MOBILITY","PED","TOTALE"];
+const MEDIA_URL="https://script.google.com/macros/s/AKfycbwUinKg0_D1nv_1ZuUj2AzvO-DaX38hyebdi28AChlf6jEx3ZVmzPxW95iCtbjzKcg8/exec?action=media";      // link /exec dell'Apps Script Media Catena + ?action=media
+const SHEET_CSV_URL="";  // link CSV "Pubblica sul web" del foglio Media Catena (se vuoto usa MEDIA_CATENA)
 let MEDIA_CATENA={};   // es. {"TV":489.90,"Telefonia":312.50}  (dal file Excel)
 const PDV=["AVEZZANO", "BOLOGNA", "CARPI", "CESENA", "CHIOGGIA", "CITTÀ DI CASTELLO", "CIVITANOVA", "CONEGLIANO", "FABRIANO", "FAENZA", "FANO", "FOLIGNO", "FORLÌ", "IMOLA", "L'AQUILA", "LANCIANO", "MACERATA", "MARANELLO", "MONSANO", "OSIMO", "PADOVA", "PERUGIA", "PESARO", "PESCARA", "REGGIO EMILIA", "RIETI", "RIMINI", "ROMA", "SAN BENEDETTO", "SAN MARINO", "SANTA MARIA DI SALA", "TERAMO", "TERMOLI", "VASTO", "VICENZA", "VITERBO"];
 // ==========================
 const $=id=>document.getElementById(id);
-$("back").onclick=e=>{e.preventDefault();HUB_URL?location.href=HUB_URL:history.back()};
 const eur=n=>n.toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2});
 const num=v=>{const n=parseFloat(String(v).replace(/\./g,"").replace(",","."));return isNaN(n)?null:n};
 $("pdv").innerHTML='<option value="">Seleziona...</option>'+PDV.map(p=>`<option>${p}</option>`).join("");
@@ -65,9 +63,14 @@ function delta(i){const r=REPARTI[i],inp=document.querySelector('#rows input[dat
  const d=v-m;el.textContent=(d>=0?"+":"")+eur(d);el.className="d "+(d>=0?"up":"dn")}
 function paintCat(){REPARTI.forEach((r,i)=>{const m=MEDIA_CATENA[r];$("c"+i).innerHTML="<i>Media catena</i>"+(m!=null?"€ "+eur(m):"-");delta(i)})}
 document.querySelectorAll("#rows input").forEach(inp=>inp.oninput=()=>delta(inp.dataset.i));
-function loadCat(){
- google.script.run.withSuccessHandler(d=>{if(d&&d.valori)MEDIA_CATENA=d.valori;paintCat()})
-  .withFailureHandler(()=>{say("Media catena non aggiornata.",1);paintCat()}).getDati()}
+async function loadCat(){
+ if(MEDIA_URL){try{const j=await (await fetch(MEDIA_URL,{cache:"no-store"})).json();if(j.valori&&Object.keys(j.valori).length)MEDIA_CATENA=j.valori}catch(e){say("Media catena non aggiornata.",1)}}
+ else if(SHEET_CSV_URL){try{const t=await (await fetch(SHEET_CSV_URL,{cache:"no-store"})).text();const M={};
+  t.split(/\r?\n/).forEach(l=>{const c=l.match(/("([^"]*)"|[^,;]+)/g);if(!c||c.length<2)return;
+   const n=c[0].replace(/"/g,"").trim().toLowerCase(),r=REPARTI.find(x=>x.toLowerCase()===n),v=num(c[1].replace(/"/g,"").replace("€",""));
+   if(r&&v!=null)M[r]=v});
+  if(Object.keys(M).length)MEDIA_CATENA=M}catch(e){say("Media catena non aggiornata: uso gli ultimi valori salvati.",1)}}
+ paintCat()}
 loadCat();
 function build(){
  const p=$("pdv").value;if(!p){say("Seleziona il PDV.",1);return null}
@@ -81,7 +84,7 @@ function build(){
  return{p,t:"PREZZI MEDI REPARTO - "+p+" - "+new Date().toLocaleDateString("it-IT")+"\n\n"+L.join("\n")}}
 function say(t,e){const m=$("msg");m.textContent=t;m.style.color=e?"var(--bad)":"var(--ok)"}
 $("ml").onclick=()=>{const b=build();if(!b)return;
- window.open("mailto:"+MAIL_TO+"?subject="+encodeURIComponent("Prezzi medi reparto - "+b.p)+"&body="+encodeURIComponent(b.t),"_top");say("Mail pronta: premi Invia nella tua app di posta.")};
+ location.href="mailto:"+MAIL_TO+"?subject="+encodeURIComponent("Prezzi medi reparto - "+b.p)+"&body="+encodeURIComponent(b.t);say("Mail pronta: premi Invia nella tua app di posta.")};
 $("tg").onclick=async()=>{const b=build();if(!b)return;
  try{await navigator.clipboard.writeText(b.t)}catch(e){}
  const q=encodeURIComponent(b.t);
