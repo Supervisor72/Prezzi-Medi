@@ -30,6 +30,8 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 button{font:inherit;font-weight:700;border-radius:10px;padding:15px;cursor:pointer}
 #ml{border:0;color:#0d0f14;background:linear-gradient(135deg,var(--gold),var(--g2) 60%,var(--g1))}
 #tg{color:var(--gold);background:transparent;border:1.5px solid var(--gold)}
+#jp{grid-column:1/-1;color:var(--ink);background:var(--card);border:1.5px solid var(--in)}
+#prev{display:none;width:100%;margin-top:14px;border-radius:8px;border:1px solid var(--line)}
 #msg{min-height:1.4em;margin-top:14px;font-weight:700}
 </style></head><body><main>
 <h1>Prezzi medi per reparto</h1>
@@ -37,8 +39,9 @@ button{font:inherit;font-weight:700;border-radius:10px;padding:15px;cursor:point
 <div class="box"><label for="pdv">Punto vendita</label>
 <select id="pdv"></select></div>
 <div class="box"><div id="rows"></div></div>
-<div class="acts"><button id="tg" type="button">Invia su Telegram</button><button id="ml" type="button">Invia via mail</button></div>
+<div class="acts"><button id="tg" type="button">Invia su Telegram</button><button id="ml" type="button">Invia via mail</button><button id="jp" type="button">Crea e condividi JPG</button></div>
 <div id="msg" role="status"></div>
+<img id="prev" alt="Anteprima tabella">
 </main>
 <script>
 // ===== CONFIGURAZIONE =====
@@ -92,4 +95,39 @@ $("tg").onclick=async()=>{const b=build();if(!b)return;
  const url=TG_USERNAME?"https://t.me/"+TG_USERNAME+"?text="+q:"https://t.me/share/url?url=%20&text="+q;
  window.open(url,"_blank");
  say(TG_USERNAME?"Telegram aperto con il messaggio pronto. Se non compare, incollalo: è già copiato.":"Telegram aperto con il messaggio pronto: scegli il destinatario e invia.")};
+
+// ===== JPG TABELLA (solo per il PDV selezionato) =====
+function drawJpg(p){
+ const rows=[];let n=0;
+ REPARTI.forEach((r,i)=>{const v=num(document.querySelector('#rows input[data-i="'+i+'"]').value),m=MEDIA_CATENA[r];if(v!=null)n++;rows.push({r,m,d:(v!=null&&m!=null)?v-m:null})});
+ if(!n){say("Inserisci almeno un prezzo.",1);return null}
+ const X=50,W=1160,cw=[300,380,380],Y=140,hh=84,rh=58,H=Y+hh+rows.length*rh+60;
+ const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+ const F="Arial, Helvetica, sans-serif",NAVY="#20375e";
+ g.fillStyle="#fff";g.fillRect(0,0,W,H);g.textAlign="center";g.textBaseline="middle";
+ g.fillStyle=NAVY;g.font="bold 34px "+F;g.fillText("TABELLA PREZZI MEDI E SCOSTAMENTI PER REPARTO (€)",W/2,52);
+ g.fillStyle="#555";g.font="italic 22px "+F;g.fillText("PDV: "+p+" | "+new Date().toLocaleDateString("it-IT")+" | Valori negativi in ROSSO",W/2,92);
+ const xs=[X,X+cw[0],X+cw[0]+cw[1],X+cw[0]+cw[1]+cw[2]];
+ const cell=(i,y,h2,t,fill,col,font)=>{g.fillStyle=fill;g.fillRect(xs[i],y,cw[i],h2);g.strokeStyle="#000";g.lineWidth=2;g.strokeRect(xs[i],y,cw[i],h2);g.fillStyle=col;g.font=font;g.fillText(t,xs[i]+cw[i]/2,y+h2/2+1)};
+ ["Reparto","Pr. Medio CATENA",p].forEach((t,i)=>cell(i,Y,hh,t,NAVY,"#fff","bold 28px "+F));
+ const f0=v=>Math.round(Math.abs(v)).toLocaleString("it-IT");
+ rows.forEach((o,k)=>{const y=Y+hh+k*rh,tot=o.r==="TOTALE",bg=tot?"#e8f0f8":(k%2?"#fff":"#f7f8fa"),tc=tot?NAVY:"#222";
+  cell(0,y,rh,o.r,bg,tc,"bold 26px "+F);
+  cell(1,y,rh,o.m!=null?"€ "+f0(o.m):"—",bg,tc,(tot?"bold ":"")+"26px "+F);
+  if(o.d==null)cell(2,y,rh,"—",bg,tc,"26px "+F);
+  else if(o.d<0)cell(2,y,rh,"-€ "+f0(o.d),bg,"#c00000","bold 26px "+F);
+  else cell(2,y,rh,"€ "+f0(o.d),bg,tc,(tot?"bold ":"")+"26px "+F)});
+ return c}
+$("jp").onclick=()=>{
+ const p=$("pdv").value;if(!p){say("Seleziona il PDV.",1);return}
+ const c=drawJpg(p);if(!c)return;
+ c.toBlob(async blob=>{
+  const name="Prezzi medi "+p+".jpg",url=URL.createObjectURL(blob);
+  $("prev").src=url;$("prev").style.display="block";
+  const file=new File([blob],name,{type:"image/jpeg"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+   try{await navigator.share({files:[file],title:"Prezzi medi "+p});say("JPG pronto: scegli Telegram o Mail dal menu di condivisione.");return}catch(e){if(e&&e.name==="AbortError")return}}
+  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  say("JPG scaricato: allegalo tu al messaggio o alla mail.")
+ },"image/jpeg",0.92)};
 </script></body></html>
